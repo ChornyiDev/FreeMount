@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreeMount - Add New Cloud Storage</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* macOS Tahoe Liquid Mica / Vibrancy effects */
+    .macos-window {
+      box-shadow: 
+        0 0 0 1px rgba(255, 255, 255, 0.12),
+        0 24px 70px -12px rgba(0, 0, 0, 0.8),
+        0 8px 24px -4px rgba(0, 0, 0, 0.5),
+        0 0 35px 2px rgba(14, 165, 233, 0.08);
+      backdrop-filter: blur(48px) saturate(190%);
+      -webkit-backdrop-filter: blur(48px) saturate(190%);
+    }
+
+    .macos-sidebar {
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+    }
+
+    /* Custom range slider thumb styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 14px;
+      width: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(0,0,0,0.2);
+      cursor: pointer;
+      margin-top: -4px;
+      transition: transform 0.1s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 9999px;
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-[#0b0f17] min-h-screen flex items-center justify-center p-6 antialiased selection:bg-sky-500/30 selection:text-sky-200">
+
+  <!-- Desktop Wallpaper Ambience Simulator -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden flex items-center justify-center opacity-40">
+    <div class="absolute w-[800px] h-[500px] bg-gradient-to-tr from-sky-600/20 via-indigo-700/15 to-purple-600/10 rounded-full blur-[120px]"></div>
+    <div class="absolute -top-20 -right-20 w-[450px] h-[450px] bg-cyan-500/10 rounded-full blur-[90px]"></div>
+  </div>
+
+  <!-- Main macOS Sheet Modal Window (640px x 520px) -->
+  <div class="macos-window relative w-[640px] h-[520px] bg-[#1a1e27]/85 rounded-[18px] flex flex-col overflow-hidden border border-white/10 z-10 transition-all duration-300">
+    
+    <!-- Window Header / Titlebar -->
+    <div class="h-11 px-4 flex items-center justify-between border-b border-white/[0.08] bg-white/[0.03] select-none flex-shrink-0">
+      <div class="flex items-center space-x-2">
+        <!-- Traffic lights -->
+        <div class="flex items-center space-x-1.5 group cursor-pointer">
+          <div class="w-3 h-3 rounded-full bg-[#ff5f57] border border-[#e0443e]/40 flex items-center justify-center text-[8px] text-black/60 opacity-90 transition group-hover:opacity-100">
+            <i class="fa-solid fa-xmark opacity-0 group-hover:opacity-100 text-[7px]"></i>
+          </div>
+          <div class="w-3 h-3 rounded-full bg-[#febc2e] border border-[#d89e24]/40 flex items-center justify-center text-[8px] text-black/60 opacity-90 transition group-hover:opacity-100">
+            <i class="fa-solid fa-minus opacity-0 group-hover:opacity-100 text-[6px]"></i>
+          </div>
+          <div class="w-3 h-3 rounded-full bg-[#28c840] border border-[#1aab29]/40 flex items-center justify-center text-[8px] text-black/60 opacity-90 transition group-hover:opacity-100">
+            <i class="fa-solid fa-up-right-and-down-left-from-center opacity-0 group-hover:opacity-100 text-[5px]"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Window Title -->
+      <div class="flex items-center space-x-2 text-xs font-semibold text-white/90 tracking-tight">
+        <i class="fa-solid fa-cloud-arrow-up text-sky-400 text-xs"></i>
+        <span>Add Cloud Storage Mount</span>
+      </div>
+
+      <!-- Tahoe subtle badge indicator -->
+      <div class="flex items-center space-x-1 text-[11px] text-white/40 font-mono">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-[10px] tracking-wider uppercase font-medium">FUSE 4.2</span>
+      </div>
+    </div>
+
+    <!-- Body Layout: Two Columns (200px / 440px) -->
+    <div class="flex flex-1 min-h-0">
+
+      <!-- LEFT COLUMN: Provider Selector (200px) -->
+      <div class="w-[200px] bg-black/25 macos-sidebar border-r border-white/[0.08] flex flex-col p-2.5 flex-shrink-0">
+        <div class="px-2 py-1.5 text-[10px] font-bold text-white/45 tracking-wider uppercase">
+          Select Provider
+        </div>
+
+        <div class="space-y-1 mt-1 overflow-y-auto pr-0.5 flex-1">
+          <!-- 1. Google Cloud Storage (Selected) -->
+          <div class="group relative flex items-center justify-between p-2 rounded-lg bg-sky-500/15 border border-sky-400/40 text-white shadow-sm cursor-pointer transition-all">
+            <div class="flex items-center space-x-2.5 min-w-0">
+              <div class="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-[11px] shadow-sm flex-shrink-0">
+                <i class="fa-brands fa-google"></i>
+              </div>
+              <div class="truncate text-[12px] font-medium leading-tight text-white/95">
+                Google Cloud
+                <div class="text-[9.5px] text-sky-300/80 font-normal">GCS Bucket</div>
+              </div>
+            </div>
+            <div class="w-4 h-4 rounded-full bg-sky-500 flex items-center justify-center text-white text-[9px] shadow-sm flex-shrink-0 ml-1">
+              <i class="fa-solid fa-check"></i>
+            </div>
+            <!-- Tahoe soft active glow indicator -->
+            <div class="absolute inset-0 rounded-lg ring-1 ring-sky-400/30 pointer-events-none"></div>
+          </div>
+
+          <!-- 2. SFTP (Cloudflare Tunnel) -->
+          <div class="group flex items-center justify-between p-2 rounded-lg hover:bg-white/[0.05] border border-transparent hover:border-white/5 text-white/70 hover:text-white cursor-pointer transition-all">
+            <div class="flex items-center space-x-2.5 min-w-0">
+              <div class="w-6 h-6 rounded-md bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-[11px] flex-shrink-0">
+                <i class="fa-solid fa-server"></i>
+              </div>
+              <div class="truncate text-[12px] font-normal group-hover:font-medium leading-tight">
+                SFTP
+                <div class="text-[9.5px] text-white/40 font-normal truncate">Cloudflare Tunnel</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Amazon S3 & R2 -->
+          <div class="group flex items-center justify-between p-2 rounded-lg hover:bg-white/[0.05] border border-transparent hover:border-white/5 text-white/70 hover:text-white cursor-pointer transition-all">
+            <div class="flex items-center space-x-2.5 min-w-0">
+              <div class="w-6 h-6 rounded-md bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center justify-center text-[11px] flex-shrink-0">
+                <i class="fa-brands fa-aws"></i>
+              </div>
+              <div class="truncate text-[12px] font-normal group-hover:font-medium leading-tight">
+                Amazon S3
+                <div class="text-[9.5px] text-white/40 font-normal truncate">& Cloudflare R2</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Google Drive -->
+          <div class="group flex items-center justify-between p-2 rounded-lg hover:bg-white/[0.05] border border-transparent hover:border-white/5 text-white/70 hover:text-white cursor-pointer transition-all">
+            <div class="flex items-center space-x-2.5 min-w-0">
+              <div class="w-6 h-6 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-[11px] flex-shrink-0">
+                <i class="fa-brands fa-google-drive"></i>
+              </div>
+              <div class="truncate text-[12px] font-normal group-hover:font-medium leading-tight">
+                Google Drive
+                <div class="text-[9.5px] text-white/40 font-normal truncate">Workspace API</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. WebDAV / SMB -->
+          <div class="group flex items-center justify-between p-2 rounded-lg hover:bg-white/[0.05] border border-transparent hover:border-white/5 text-white/70 hover:text-white cursor-pointer transition-all">
+            <div class="flex items-center space-x-2.5 min-w-0">
+              <div class="w-6 h-6 rounded-md bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-[11px] flex-shrink-0">
+                <i class="fa-solid fa-network-wired"></i>
+              </div>
+              <div class="truncate text-[12px] font-normal group-hover:font-medium leading-tight">
+                WebDAV / SMB
+                <div class="text-[9.5px] text-white/40 font-normal truncate">NAS & Local Share</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar footer helper -->
+        <div class="p-2 border-t border-white/[0.06] bg-white/[0.01] rounded-md">
+          <div class="flex items-center space-x-1.5 text-[10px] text-white/40">
+            <i class="fa-solid fa-shield-halved text-[9px] text-sky-400"></i>
+            <span>End-to-end encrypted</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Configuration Details Form (440px) -->
+      <div class="w-[440px] flex-1 flex flex-col min-h-0 bg-transparent">
+        <div class="p-3.5 pb-2 overflow-y-auto space-y-3.5 flex-1 pr-4">
+
+          <!-- Section Title Header -->
+          <div class="flex items-center justify-between">
+            <span class="text-[10.5px] font-bold uppercase tracking-wider text-white/45">Configuration Details</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 font-medium">Google Cloud Storage</span>
+          </div>
+
+          <!-- Inputs Row: Connection Name & Bucket Name -->
+          <div class="grid grid-cols-2 gap-2.5">
+            <!-- 1. Connection Name -->
+            <div class="space-y-1">
+              <label class="block text-[11px] font-medium text-white/80">Connection Name</label>
+              <div class="relative">
+                <input 
+                  type="text" 
+                  value="Production GCS Bucket"
+                  class="w-full h-7 px-2.5 rounded-md bg-black/35 border border-white/15 text-[12px] text-white/95 placeholder-white/30 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/40 transition shadow-inner font-normal"
+                />
+              </div>
+            </div>
+
+            <!-- 2. Bucket Name -->
+            <div class="space-y-1">
+              <label class="block text-[11px] font-medium text-white/80">Bucket Name</label>
+              <div class="relative">
+                <input 
+                  type="text" 
+                  value="my-company-prod-bucket"
+                  class="w-full h-7 px-2.5 rounded-md bg-black/35 border border-white/15 text-[12px] text-white/95 placeholder-white/30 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/40 transition shadow-inner font-mono text-[11.5px]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Authentication Section -->
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="block text-[11px] font-medium text-white/80">Authentication Method</label>
+              <span class="text-[10px] text-white/40">GCP IAM Role</span>
+            </div>
+
+            <!-- Segmented Control (macOS Tahoe style) -->
+            <div class="grid grid-cols-2 p-0.5 rounded-lg bg-black/40 border border-white/10 text-[11px]">
+              <button type="button" class="py-1 px-2 rounded-[6px] bg-white/[0.12] text-white font-medium shadow-sm border border-white/[0.1] text-center transition flex items-center justify-center space-x-1.5">
+                <i class="fa-solid fa-key text-[10px] text-sky-400"></i>
+                <span>Service Account Key (JSON)</span>
+              </button>
+              <button type="button" class="py-1 px-2 rounded-[6px] text-white/50 hover:text-white/80 font-normal text-center transition flex items-center justify-center space-x-1.5">
+                <i class="fa-solid fa-fingerprint text-[10px]"></i>
+                <span>OAuth 2.0 Browser</span>
+              </button>
+            </div>
+
+            <!-- Modern dashed drag-and-drop file zone -->
+            <div class="border border-dashed border-sky-400/40 bg-sky-500/[0.04] hover:bg-sky-500/[0.07] rounded-lg p-2.5 flex items-center justify-between transition group cursor-pointer">
+              <div class="flex items-center space-x-2.5 min-w-0">
+                <div class="w-7 h-7 rounded-md bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs flex-shrink-0 group-hover:scale-105 transition-transform">
+                  <i class="fa-solid fa-file-code"></i>
+                </div>
+                <div class="truncate text-left">
+                  <div class="text-[11.5px] font-medium text-white/90 truncate">serviceAccountKey.json</div>
+                  <div class="text-[9.5px] text-emerald-400 flex items-center space-x-1 font-mono">
+                    <i class="fa-solid fa-circle-check text-[8px]"></i>
+                    <span>2.4 KB • Key ID: 89f4b1e9...</span>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="px-2.5 py-1 text-[11px] rounded bg-white/10 hover:bg-white/15 border border-white/15 text-white/90 font-medium transition shadow-sm flex-shrink-0">
+                Replace...
+              </button>
+            </div>
+          </div>
+
+          <!-- 4. Local Mount Point -->
+          <div class="space-y-1">
+            <label class="block text-[11px] font-medium text-white/80">Local Mount Point (macOS Tahoe)</label>
+            <div class="flex items-center space-x-2">
+              <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-white/40 text-[11px]">
+                  <i class="fa-regular fa-folder-open"></i>
+                </div>
+                <input 
+                  type="text" 
+                  value="~/Cloud/production-gcs"
+                  class="w-full h-7 pl-7 pr-2 rounded-md bg-black/35 border border-white/15 text-[12px] text-white/95 focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-400/40 transition font-mono"
+                />
+              </div>
+              <button type="button" class="h-7 px-3 text-[11px] rounded-md bg-white/10 hover:bg-white/15 border border-white/15 text-white font-medium transition shadow-sm flex-shrink-0 flex items-center space-x-1">
+                <span>Browse...</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 5. Performance Cache (Horizontal Sliders) -->
+          <div class="bg-black/25 border border-white/[0.07] rounded-lg p-2.5 space-y-2">
+            <div class="flex items-center justify-between text-[10px] font-semibold text-white/50 uppercase tracking-wider">
+              <span>Performance & VFS Cache</span>
+              <span class="text-[9.5px] text-white/40 font-normal">FUSE Async Writes</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <!-- Cache Size Slider -->
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-[11px]">
+                  <span class="text-white/70">Max Cache Size:</span>
+                  <span class="font-mono text-sky-400 font-semibold text-[11px]">25 GB</span>
+                </div>
+                <input type="range" min="5" max="100" value="25" class="w-full accent-sky-400">
+                <div class="flex justify-between text-[9px] text-white/30 font-mono">
+                  <span>5 GB</span>
+                  <span>100 GB</span>
+                </div>
+              </div>
+
+              <!-- Cache Age Slider -->
+              <div class="space-y-1">
+                <div class="flex items-center justify-between text-[11px]">
+                  <span class="text-white/70">Max Cache Age:</span>
+                  <span class="font-mono text-sky-400 font-semibold text-[11px]">24h</span>
+                </div>
+                <input type="range" min="1" max="72" value="24" class="w-full accent-sky-400">
+                <div class="flex justify-between text-[9px] text-white/30 font-mono">
+                  <span>1h</span>
+                  <span>72h</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. Checkbox: Mount automatically on login -->
+          <div class="flex items-center space-x-2 pt-0.5">
+            <input 
+              id="auto-mount" 
+              type="checkbox" 
+              checked 
+              class="w-3.5 h-3.5 rounded bg-black/40 border-white/20 text-sky-500 focus:ring-0 focus:ring-offset-0 accent-sky-500 cursor-pointer"
+            />
+            <label for="auto-mount" class="text-[11.5px] text-white/85 select-none cursor-pointer font-normal">
+              Mount automatically on system login
+            </label>
+          </div>
+
+        </div>
+
+        <!-- FOOTER BAR: Fixed at bottom of dialog (macOS Sheet Standard) -->
+        <div class="h-12 px-4 bg-white/[0.04] border-t border-white/[0.08] flex items-center justify-between select-none flex-shrink-0">
+          
+          <!-- Test Connection Button (showing green check 'Connected!') -->
+          <button type="button" class="group flex items-center space-x-1.5 h-7 px-3 rounded-md bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/25 text-[11.5px] font-medium transition shadow-sm">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 group-hover:scale-110 transition-transform"></span>
+            <i class="fa-solid fa-check text-[10px] text-emerald-400"></i>
+            <span>Connected! (42ms)</span>
+          </button>
+
+          <!-- Right Action Buttons: Cancel and Save & Mount -->
+          <div class="flex items-center space-x-2">
+            <button type="button" class="h-7 px-3.5 rounded-md bg-white/10 hover:bg-white/15 border border-white/10 text-white/80 hover:text-white text-[12px] font-medium transition">
+              Cancel
+            </button>
+            <button type="button" class="h-7 px-4 rounded-md bg-gradient-to-b from-sky-500 to-sky-600 hover:from-sky-400 hover:to-sky-500 text-white text-[12px] font-semibold transition shadow-md shadow-sky-500/25 border border-sky-400/40 flex items-center space-x-1.5 active:scale-[0.98]">
+              <i class="fa-solid fa-arrow-down-to-bracket text-[10px]"></i>
+              <span>Save & Mount</span>
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

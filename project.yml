@@ -1,0 +1,63 @@
+name: FreeMount
+options:
+  minimumXcodeGenVersion: 2.46.0
+  deploymentTarget:
+    macOS: "14.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.10"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    CODE_SIGN_STYLE: Automatic
+targets:
+  FreeMount:
+    type: application
+    platform: macOS
+    sources:
+      - path: App
+        excludes:
+          - FileProviderExtension
+          - CONTEXT.md
+      - path: assets/icons/AppIcon.icon
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.freemount.app
+        PRODUCT_NAME: FM
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_FILE: App/Resources/Info.plist
+        CODE_SIGN_ENTITLEMENTS: App/Resources/FreeMount.entitlements
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - target: FreeMountFileProvider
+        embed: true
+    postBuildScripts:
+      - path: scripts/package-rclone-runtime.sh
+        name: Package verified rclone runtimes
+        shell: /bin/zsh
+        showEnvVars: false
+        basedOnDependencyAnalysis: false
+
+  FreeMountFileProvider:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: App
+        excludes:
+          - App
+          - Views
+          - Resources
+          - CONTEXT.md
+      - path: App/Resources/Assets.xcassets
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.freemount.app.fileprovider
+        PRODUCT_NAME: FreeMountFileProvider
+        INFOPLIST_FILE: App/FileProviderExtension/Info.plist
+        CODE_SIGN_ENTITLEMENTS: App/FileProviderExtension/FreeMountFileProvider.entitlements
+        SKIP_INSTALL: NO
+        APPLICATION_EXTENSION_API_ONLY: YES
+        GENERATE_INFOPLIST_FILE: NO
+    dependencies:
+      - framework: FileProvider.framework
+      - framework: Security.framework

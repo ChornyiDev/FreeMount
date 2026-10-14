@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FreeMount Settings</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Helvetica Neue", Inter, sans-serif;
+      --font-mono: "SF Mono", "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: radial-gradient(circle at 50% 30%, #151a24 0%, #0c0f14 100%);
+    }
+
+    /* macOS Window Shadows & Glow */
+    .macos-window-shadow {
+      box-shadow: 
+        0 30px 70px -10px rgba(0, 0, 0, 0.75),
+        0 15px 35px -5px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.12),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.16);
+    }
+
+    /* Glass Effect */
+    .macos-glass {
+      background: rgba(26, 31, 41, 0.78);
+      backdrop-filter: blur(40px) saturate(190%);
+      -webkit-backdrop-filter: blur(40px) saturate(190%);
+    }
+
+    .macos-glass-header {
+      background: linear-gradient(180deg, rgba(35, 42, 54, 0.85) 0%, rgba(28, 33, 44, 0.8) 100%);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+    }
+
+    /* Custom Toggle Switch styling conforming to macOS Tahoe/Sequoia */
+    .macos-toggle {
+      position: relative;
+      display: inline-block;
+      width: 36px;
+      height: 20px;
+    }
+
+    .macos-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .macos-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(255, 255, 255, 0.14);
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 9999px;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .macos-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 1.5px;
+      background: #ffffff;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4), 0 1px 1px rgba(0,0,0,0.2);
+    }
+
+    input:checked + .macos-slider {
+      background-color: #0A84FF;
+      border-color: rgba(10, 132, 255, 0.8);
+      box-shadow: 0 0 12px rgba(10, 132, 255, 0.35);
+    }
+
+    input:checked + .macos-slider:before {
+      transform: translateX(16px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    /* Segmented Control Button States */
+    .segmented-btn {
+      position: relative;
+      transition: all 0.18s ease;
+    }
+    
+    .segmented-active {
+      background: rgba(255, 255, 255, 0.14);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), inset 0 0.5px 0 rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      font-weight: 500;
+    }
+
+    /* Window Controls Traffic Lights */
+    .traffic-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+    }
+    .traffic-close { background: #FF5F56; border: 0.5px solid #E0443E; }
+    .traffic-minimize { background: #FFBD2E; border: 0.5px solid #DEA123; }
+    .traffic-zoom { background: #27C93F; border: 0.5px solid #1AAB29; }
+    
+    .traffic-dot:hover i {
+      opacity: 0.6;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 text-slate-200 select-none">
+
+  <!-- macOS Settings Window (560px × 420px standard layout) -->
+  <div class="w-[560px] h-[420px] rounded-xl macos-glass macos-window-shadow border border-white/15 flex flex-col overflow-hidden relative backdrop-blur-3xl">
+
+    <!-- Top Window Titlebar & Toolbar Tabs -->
+    <header class="h-[72px] macos-glass-header border-b border-white/10 flex flex-col justify-between pt-3 px-4 pb-0 shrink-0 relative">
+      <!-- Window Controls & Centered Window Title -->
+      <div class="flex items-center justify-between w-full h-5 relative">
+        <!-- Traffic lights -->
+        <div class="flex items-center space-x-2 group">
+          <div class="traffic-dot traffic-close">
+            <i class="fa-solid fa-xmark text-[7px] text-black/70 opacity-0 transition-opacity"></i>
+          </div>
+          <div class="traffic-dot traffic-minimize">
+            <i class="fa-solid fa-minus text-[7px] text-black/70 opacity-0 transition-opacity"></i>
+          </div>
+          <div class="traffic-dot traffic-zoom">
+            <i class="fa-solid fa-up-right-and-down-left-from-center text-[6px] text-black/70 opacity-0 transition-opacity"></i>
+          </div>
+        </div>
+
+        <!-- Window Title -->
+        <div class="absolute inset-x-0 mx-auto text-center pointer-events-none">
+          <span class="text-[12.5px] font-semibold text-white/90 tracking-tight">FreeMount Settings</span>
+        </div>
+
+        <div class="w-12"></div> <!-- Spacer balance -->
+      </div>
+
+      <!-- Toolbar Tab Bar (macOS Sequoia / Tahoe Unified Toolbar) -->
+      <div class="flex items-center justify-center space-x-1 pb-1.5 -mb-px">
+        <!-- Tab 1: General (Active) -->
+        <button class="relative flex flex-col items-center justify-center px-4 py-1 rounded-md text-sky-400 group focus:outline-none transition-all duration-150">
+          <div class="flex items-center space-x-1.5 mb-0.5">
+            <i class="fa-solid fa-gear text-[13px]"></i>
+            <span class="text-[11.5px] font-medium tracking-tight">General</span>
+          </div>
+          <!-- Active Indicator Pill -->
+          <div class="absolute bottom-0 w-8 h-[2px] bg-sky-400 rounded-full shadow-[0_0_8px_rgba(56,189,248,0.7)]"></div>
+        </button>
+
+        <!-- Tab 2: Rclone Engine -->
+        <button class="relative flex flex-col items-center justify-center px-4 py-1 rounded-md text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all duration-150 focus:outline-none">
+          <div class="flex items-center space-x-1.5 mb-0.5">
+            <i class="fa-solid fa-terminal text-[12px] opacity-75"></i>
+            <span class="text-[11.5px] font-medium tracking-tight">Rclone Engine</span>
+          </div>
+        </button>
+
+        <!-- Tab 3: Storage & Cache -->
+        <button class="relative flex flex-col items-center justify-center px-4 py-1 rounded-md text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all duration-150 focus:outline-none">
+          <div class="flex items-center space-x-1.5 mb-0.5">
+            <i class="fa-solid fa-hard-drive text-[12px] opacity-75"></i>
+            <span class="text-[11.5px] font-medium tracking-tight">Storage & Cache</span>
+          </div>
+        </button>
+
+        <!-- Tab 4: About -->
+        <button class="relative flex flex-col items-center justify-center px-4 py-1 rounded-md text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all duration-150 focus:outline-none">
+          <div class="flex items-center space-x-1.5 mb-0.5">
+            <i class="fa-solid fa-circle-info text-[12px] opacity-75"></i>
+            <span class="text-[11.5px] font-medium tracking-tight">About</span>
+          </div>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area: General Tab -->
+    <main class="flex-1 overflow-y-auto px-5 py-3 space-y-3.5 custom-scrollbar">
+
+      <!-- Group 1: System Integration Group -->
+      <section>
+        <div class="text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider px-1 mb-1.5 flex items-center gap-1.5">
+          <i class="fa-solid fa-sliders text-[9px] text-sky-400/80"></i>
+          System Integration
+        </div>
+        <div class="bg-black/25 rounded-lg border border-white/10 p-2.5 divide-y divide-white/5 shadow-inner">
+          
+          <!-- Item 1: Launch at Login -->
+          <div class="flex items-center justify-between py-1.5 first:pt-0.5 px-1">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-5 h-5 rounded flex items-center justify-center bg-blue-500/15 text-blue-400 text-[10px]">
+                <i class="fa-solid fa-power-off"></i>
+              </div>
+              <div>
+                <div class="text-[12px] font-medium text-slate-100">Launch FreeMount at system login</div>
+                <div class="text-[10px] text-slate-400">Mount remote cloud drives automatically upon signing in</div>
+              </div>
+            </div>
+            <label class="macos-toggle">
+              <input type="checkbox" checked>
+              <span class="macos-slider"></span>
+            </label>
+          </div>
+
+          <!-- Item 2: Menu Bar Icon Style (Segmented Control) -->
+          <div class="flex items-center justify-between py-2 px-1">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-5 h-5 rounded flex items-center justify-center bg-amber-500/15 text-amber-400 text-[10px]">
+                <i class="fa-solid fa-bars"></i>
+              </div>
+              <div>
+                <div class="text-[12px] font-medium text-slate-100">Menu Bar Icon Style</div>
+                <div class="text-[10px] text-slate-400">Appearance of status item in the macOS menu bar</div>
+              </div>
+            </div>
+            
+            <!-- Segmented Control -->
+            <div class="inline-flex bg-black/40 p-0.5 rounded-md border border-white/10 text-[11px]">
+              <button class="segmented-btn segmented-active px-2.5 py-1 rounded flex items-center space-x-1.5 transition">
+                <i class="fa-solid fa-cloud text-[10px] text-white"></i>
+                <span class="text-[10.5px]">Monochrome SF</span>
+              </button>
+              <button class="segmented-btn px-2.5 py-1 rounded text-slate-400 hover:text-slate-200 flex items-center space-x-1.5 transition">
+                <i class="fa-solid fa-cloud text-[10px] text-sky-400"></i>
+                <span class="text-[10.5px]">Color Badge</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Item 3: Show notifications -->
+          <div class="flex items-center justify-between py-1.5 px-1">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-5 h-5 rounded flex items-center justify-center bg-purple-500/15 text-purple-400 text-[10px]">
+                <i class="fa-solid fa-bell"></i>
+              </div>
+              <div>
+                <div class="text-[12px] font-medium text-slate-100">Show notifications on mount, unmount & network dropouts</div>
+                <div class="text-[10px] text-slate-400">Native notification banner for mount health events</div>
+              </div>
+            </div>
+            <label class="macos-toggle">
+              <input type="checkbox" checked>
+              <span class="macos-slider"></span>
+            </label>
+          </div>
+
+          <!-- Item 4: Automatically open mounted drives in Finder -->
+          <div class="flex items-center justify-between py-1.5 last:pb-0.5 px-1">
+            <div class="flex items-center space-x-2.5">
+              <div class="w-5 h-5 rounded flex items-center justify-center bg-emerald-500/15 text-emerald-400 text-[10px]">
+                <i class="fa-regular fa-folder-open"></i>
+              </div>
+              <div>
+                <div class="text-[12px] font-medium text-slate-100">Automatically open mounted drives in Finder</div>
+                <div class="text-[10px] text-slate-400">Reveal virtual cloud folder window once connected</div>
+              </div>
+            </div>
+            <label class="macos-toggle">
+              <input type="checkbox" checked>
+              <span class="macos-slider"></span>
+            </label>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Group 2: Daemon & Mount Defaults Group -->
+      <section>
+        <div class="text-[10.5px] font-semibold text-slate-400 uppercase tracking-wider px-1 mb-1.5 flex items-center gap-1.5">
+          <i class="fa-solid fa-server text-[9px] text-sky-400/80"></i>
+          Daemon & Mount Defaults
+        </div>
+        <div class="bg-black/25 rounded-lg border border-white/10 p-2.5 divide-y divide-white/5 shadow-inner">
+          
+          <!-- Item 1: Default Local Mount Folder -->
+          <div class="flex items-center justify-between py-1.5 first:pt-0.5 px-1">
+            <div>
+              <div class="text-[12px] font-medium text-slate-100">Default Local Mount Folder</div>
+              <div class="text-[10px] text-slate-400">Root path where new cloud remotes are attached</div>
+            </div>
+            <div class="flex items-center space-x-1.5">
+              <div class="bg-black/40 border border-white/15 px-2 py-1 rounded text-[11px] font-mono text-sky-300 w-32 truncate shadow-inner flex items-center space-x-1.5">
+                <i class="fa-regular fa-folder text-[10px] text-slate-400"></i>
+                <span>~/Cloud/</span>
+              </div>
+              <button class="px-2.5 py-1 text-[11px] font-medium bg-white/10 hover:bg-white/15 active:bg-white/20 border border-white/15 rounded text-white shadow-sm transition">
+                Choose...
+              </button>
+            </div>
+          </div>
+
+          <!-- Item 2: Default VFS Cache Mode -->
+          <div class="flex items-center justify-between py-1.5 last:pb-0.5 px-1">
+            <div>
+              <div class="text-[12px] font-medium text-slate-100">Default VFS Cache Mode</div>
+              <div class="text-[10px] text-slate-400">Determines local chunk caching & writeback buffering</div>
+            </div>
+            <div class="relative">
+              <div class="bg-black/40 border border-white/15 hover:border-white/25 rounded px-2.5 py-1 flex items-center space-x-2 text-[11px] text-slate-200 cursor-pointer shadow-sm">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span class="font-medium">Full (Read/Write Cached — Recommended)</span>
+                <i class="fa-solid fa-chevron-up-down text-[9px] text-slate-400 ml-1"></i>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer: Status & Diagnostics with Sparkle Update button -->
+    <footer class="h-10 bg-black/40 border-t border-white/10 px-4 flex items-center justify-between shrink-0">
+      <!-- Status text -->
+      <div class="flex items-center space-x-2 text-[10.5px] text-slate-400 tracking-tight">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]"></span>
+        <span class="font-mono text-[10px] text-slate-300">FreeMount v0.1.0 (Build 2026.09)</span>
+        <span class="text-white/20">•</span>
+        <span class="text-slate-400">Running with rclone daemon <span class="font-mono text-slate-300">PID 84210</span></span>
+      </div>
+
+      <!-- Sparkle Check for Updates button -->
+      <button class="flex items-center space-x-1.5 px-2.5 py-1 text-[10.5px] font-medium text-slate-300 hover:text-white bg-white/5 hover:bg-white/10 active:bg-white/15 border border-white/10 rounded-md transition shadow-sm group">
+        <i class="fa-solid fa-wand-magic-sparkles text-[9px] text-sky-400 group-hover:rotate-12 transition-transform"></i>
+        <span>Check for Updates...</span>
+      </button>
+    </footer>
+
+  </div>
+
+</body>
+</html>

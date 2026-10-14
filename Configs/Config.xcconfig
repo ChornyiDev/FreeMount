@@ -1,0 +1,4 @@
+// FreeMount Base Configuration
+// Conditionally includes local secrets if present.
+
+#include? "Secrets.xcconfig"

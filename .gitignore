@@ -1,0 +1,113 @@
+# =============================================================================
+# FreeMount — Git Ignore Rules for macOS / Swift / rclone
+# =============================================================================
+
+# --- Operating systems ---
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*~
+
+# --- Xcode & Swift Build Artifacts ---
+build/
+.build/
+DerivedData/
+*.pbxproj.bak
+*.xcuserstate
+xcuserdata/
+*.xcscmblueprint
+*.moved-aside
+*.ipa
+*.dSYM.zip
+*.dSYM
+profile
+*.moved-aside
+
+# --- Swift Package Manager ---
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+.swiftpm/configuration/
+
+# --- Environment, Secrets & Cloud Keys (NEVER COMMIT) ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+serviceAccountKey.json
+*service-account*.json
+rclone.conf
+.secrets
+.secret*
+Secrets.xcconfig
+*.local.xcconfig
+Configs/Secrets.xcconfig
+!Configs/Secrets.xcconfig.example
+
+# --- Local Mount Test Paths ---
+/mounts/
+/test-mount/
+tmp/
+temp/
+.temp/
+scratch/
+
+# --- Testing & Logs ---
+*.log
+logs/
+coverage/
+*.lcov
+
+# --- IDEs & Editors ---
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# --- Local MCP Configs (May contain sensitive keys) ---
+**/.mcp.json
+**/mcp.json
+**/mcp_config.json
+**/mcp-config.json
+**/mcp.config.json
+**/mcp.local.json
+**/mcp.local.toml
+**/mcp.local.yaml
+**/mcp.local.yml
+!**/mcp.example.json
+!**/mcp_config.example.json
+
+# --- Agent-local Caches & State ---
+graphify-out/
+.graphify/
+.cursor/plans/
+.cursor/projects/
+.cursor/mcp.json
+
+# --- Local-only planning / agent state ---
+roadmap/
+SESSION.md
+
+# --- Local-only archive ---
+archive/
+
+# --- Local-only owner/agent files ---
+user_tasks.md
+raw/
+
+# --- Signing material and release artifacts ---
+*.mobileprovision
+*.provisionprofile
+*.p8
+*.xcarchive
+*.dmg
+*.pkg
+*.app/
+.swiftpm/
