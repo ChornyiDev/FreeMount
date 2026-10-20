@@ -13,7 +13,7 @@ engineering rules, safety constraints, and the active technology profile.
 ## 1. Project Context
 
 - **Product:** FreeMount — Open-source native macOS cloud storage manager powered by `rclone` and Apple's File Provider framework.
-- **Target users:** macOS power users, developers, and DevOps engineers needing cloud buckets (GCS, S3) and remote servers (SFTP) mounted as native disks in Finder without paying for commercial closed-source software (like CloudMounter).
+- **Target users:** macOS power users, developers, and DevOps engineers needing cloud storage (Google Drive, GCS) and remote servers (SFTP, WebDAV, SMB, FTP/FTPS) mounted as native disks in Finder without paying for commercial closed-source software (like CloudMounter).
 - **Business outcome:** High performance, low memory footprint, no third-party filesystem extensions, and reliable recovery after network reconnection.
 - **Current objective:** Complete secure Apple File Provider integration, verify live file hydration and writeback, and prepare release packaging.
 - **Roadmap (local only, git-ignored):** `roadmap/README.md`
@@ -201,3 +201,29 @@ unknown-outcome staging. The user subsequently authorized retiring the identifie
 removing the legacy move guard. No legacy move replay/blocking fallback remains.
 Do not interpret a connection reset as authorization to delete remote cloud objects
 or unrelated local user files. Unknown-outcome transfer staging remains protected.
+
+## 8. Public Repository Workflow
+
+- `main` is protected: pull requests are mandatory, the CI check
+  `Build & unit tests` must pass, and merges are squash-only with automatic
+  branch deletion. Never push directly to `main`, force-push, or merge with
+  admin override while checks are red.
+- CI and Release run on `macos-26` runners (Xcode 26 is required for the
+  SF Symbols 7 asset format; do not downgrade the image).
+- Releases are triggered only by pushing `v*` tags on `main`;
+  `.github/workflows/release.yml` builds per-arch DMGs
+  (`arm64`, `x86_64`) with ad-hoc signing and publishes a GitHub Release
+  with SHA256 checksums.
+- No paid Apple Developer account: builds are unsigned/un-notarized by
+  design. Do not add signing secrets, certificates, or notarization steps.
+  First-launch quarantine guidance belongs in release notes and the website.
+- `AGENTS.md`, `README.md`, and `docs/` are public. Never embed secrets,
+  private contact details, or content from the private `fm-landing` website
+  repository in this repository.
+- Public claims about the app — supported providers, features, versions,
+  binary sizes, telemetry behavior, competitor facts — must trace to
+  `README.md`, `docs/`, or explicit owner confirmation. Never fabricate
+  numbers or capabilities (including in website copy and release notes);
+  omit or ask instead.
+- Dependabot manages GitHub Actions bumps; treat its PRs like any other:
+  CI green, squash merge.
