@@ -276,7 +276,6 @@
 		F0E4F7A2121757919668EF2A /* FileProviderDomainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileProviderDomainStore.swift; sourceTree = "<group>"; };
 		F42E2BCD8B94D811E984DB95 /* ProviderID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderID.swift; sourceTree = "<group>"; };
 		FA26B8E29653BA18752651DA /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
-		C07F1901234567890ABCDEF1 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Configs/Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -372,7 +371,6 @@
 				AC89DD5EF1ECC62B440777B2 /* icons */,
 				3EA01B375D8D518E9B6B7486 /* Frameworks */,
 				C12A7EA5549119A4520A09B4 /* Products */,
-				C07F1901234567890ABCDEF1 /* Config.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -927,7 +925,6 @@
 		};
 		70EC4D65EFA8E036643EF23F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C07F1901234567890ABCDEF1 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -992,7 +989,6 @@
 		};
 		7282085B8E1965E876EC3717 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C07F1901234567890ABCDEF1 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/Resources/FreeMount.entitlements;
@@ -1011,7 +1007,6 @@
 		};
 		82BCAD5151BF25B66C573329 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C07F1901234567890ABCDEF1 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1069,7 +1064,6 @@
 		};
 		BFD24E431C3FDFED867D5E18 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C07F1901234567890ABCDEF1 /* Config.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/Resources/FreeMount.entitlements;
