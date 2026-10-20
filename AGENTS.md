@@ -70,6 +70,8 @@ root/
 │   ├── adding-a-provider.md     # contributor guide for new providers
 │   ├── providers/               # per-provider setup and limits
 │   └── README.md
+├── fm-landing/                  # website (landing + privacy + terms); separate PRIVATE git repo, ignored here
+│   └── CONTEXT.md
 ├── prototypes/                  # UI prototypes / design experiments
 │   └── CONTEXT.md
 ├── roadmap/                     # milestones and execution plans (local only, git-ignored)

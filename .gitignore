@@ -111,3 +111,6 @@ raw/
 *.pkg
 *.app/
 .swiftpm/
+
+# --- Separate private repo (nested, ignored here) ---
+fm-landing/
