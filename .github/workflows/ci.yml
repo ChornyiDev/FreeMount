@@ -12,7 +12,7 @@ on:
 jobs:
   build-and-test:
     name: Build & unit tests
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
 
