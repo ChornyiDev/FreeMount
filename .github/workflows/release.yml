@@ -51,11 +51,16 @@ jobs:
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
             build
 
-      - name: Ad-hoc sign bundle (extension first, then app)
+      - name: Ad-hoc sign bundle (nested Mach-O first, then app)
         run: |
           APP="ci-derived/Build/Products/Release/FM.app"
           # TODO(Task 12 spike): verify App Group + Keychain access group +
           # File Provider registration survive ad-hoc signing on a clean Mac.
+          # CI builds with signing disabled, so bundled rclone helpers arrive
+          # unsigned; every Mach-O must carry a signature to run (required on
+          # Apple silicon), hence sign helpers -> appex -> app.
+          codesign --force --sign - "$APP/Contents/Helpers/rclone-arm64"
+          codesign --force --sign - "$APP/Contents/Helpers/rclone-amd64"
           codesign --force --sign - \
             --entitlements App/FileProviderExtension/FreeMountFileProvider.entitlements \
             "$APP/Contents/PlugIns/FreeMountFileProvider.appex"
