@@ -5,7 +5,9 @@
     <key>FreeMountKeychainAccessGroup</key>
     <string>$(AppIdentifierPrefix)com.freemount.credentials</string>
     <key>CFBundleDisplayName</key>
-    <string>FM</string>
+    <string>FreeMount</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
     <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
     <key>CFBundleName</key>

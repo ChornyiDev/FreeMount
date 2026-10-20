@@ -51,23 +51,48 @@ jobs:
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
             build
 
+      - name: Verify OAuth config embedded in built app
+        run: |
+          APP="ci-derived/Build/Products/Release/FM.app"
+          ID="$(plutil -extract FreeMountGoogleOAuthClientID raw "$APP/Contents/Info.plist" 2>/dev/null || true)"
+          if [ -z "$ID" ]; then
+            echo "::error=Built app has empty FREEMOUNT_GOOGLE_CLIENT_ID — xcconfig wiring or secrets broken"
+            exit 1
+          fi
+
       - name: Ad-hoc sign bundle (nested Mach-O first, then app)
         run: |
           APP="ci-derived/Build/Products/Release/FM.app"
           # TODO(Task 12 spike): verify App Group + Keychain access group +
           # File Provider registration survive ad-hoc signing on a clean Mac.
+          # Xcode expands $(TeamIdentifierPrefix)/$(AppIdentifierPrefix) only in
+          # its own signing step; manual codesign embeds them literally, so for
+          # ad-hoc (no team) builds we strip the empty prefixes ourselves.
+          python3 - <<'PYEOF'
+          import plistlib
+          def clean(src, dst):
+              d = plistlib.load(open(src, "rb"))
+              for k, v in list(d.items()):
+                  if isinstance(v, list):
+                      v = [s.replace("$(TeamIdentifierPrefix)", "").replace("$(AppIdentifierPrefix)", "")
+                           if isinstance(s, str) else s for s in v]
+                      d[k] = [s for s in v if s != ""]
+                  elif isinstance(v, str):
+                      d[k] = v.replace("$(TeamIdentifierPrefix)", "").replace("$(AppIdentifierPrefix)", "")
+              plistlib.dump(d, open(dst, "wb"))
+          clean("App/Resources/FreeMount.entitlements", "/tmp/app.ent")
+          clean("App/FileProviderExtension/FreeMountFileProvider.entitlements", "/tmp/ext.ent")
+          PYEOF
           # CI builds with signing disabled, so bundled rclone helpers arrive
           # unsigned; every Mach-O must carry a signature to run (required on
           # Apple silicon), hence sign helpers -> appex -> app.
           codesign --force --sign - "$APP/Contents/Helpers/rclone-arm64"
           codesign --force --sign - "$APP/Contents/Helpers/rclone-amd64"
-          codesign --force --sign - \
-            --entitlements App/FileProviderExtension/FreeMountFileProvider.entitlements \
+          codesign --force --sign - --entitlements /tmp/ext.ent \
             "$APP/Contents/PlugIns/FreeMountFileProvider.appex"
-          codesign --force --sign - \
-            --entitlements App/Resources/FreeMount.entitlements \
-            "$APP"
-          codesign --verify --deep --verbose=2 "$APP"
+          codesign --force --sign - --entitlements /tmp/app.ent "$APP"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          codesign -d --entitlements :- "$APP" | grep -q 'TeamIdentifierPrefix' && exit 1 || true
 
       - name: Create DMG
         run: |

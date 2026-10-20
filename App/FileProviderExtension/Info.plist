@@ -6,6 +6,8 @@
     <string>$(AppIdentifierPrefix)com.freemount.credentials</string>
     <key>CFBundleDisplayName</key>
     <string>FM</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIcons</key>
     <dict>
         <key>CFBundlePrimaryIcon</key>
