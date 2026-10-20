@@ -51,6 +51,15 @@ jobs:
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
             build
 
+      - name: Verify OAuth config embedded in built app
+        run: |
+          APP="ci-derived/Build/Products/Release/FM.app"
+          ID="$(plutil -extract FreeMountGoogleOAuthClientID raw "$APP/Contents/Info.plist" 2>/dev/null || true)"
+          if [ -z "$ID" ]; then
+            echo "::error=Built app has empty FREEMOUNT_GOOGLE_CLIENT_ID — xcconfig wiring or secrets broken"
+            exit 1
+          fi
+
       - name: Ad-hoc sign bundle (nested Mach-O first, then app)
         run: |
           APP="ci-derived/Build/Products/Release/FM.app"

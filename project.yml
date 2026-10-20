@@ -3,6 +3,12 @@ options:
   minimumXcodeGenVersion: 2.46.0
   deploymentTarget:
     macOS: "14.0"
+configs:
+  Debug: debug
+  Release: release
+configFiles:
+  Debug: Configs/Config.xcconfig
+  Release: Configs/Config.xcconfig
 settings:
   base:
     SWIFT_VERSION: "5.10"
