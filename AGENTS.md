@@ -213,10 +213,16 @@ or unrelated local user files. Unknown-outcome transfer staging remains protecte
 - Releases are triggered only by pushing `v*` tags on `main`;
   `.github/workflows/release.yml` builds per-arch DMGs
   (`arm64`, `x86_64`) with ad-hoc signing and publishes a GitHub Release
-  with SHA256 checksums.
-- No paid Apple Developer account: builds are unsigned/un-notarized by
-  design. Do not add signing secrets, certificates, or notarization steps.
-  First-launch quarantine guidance belongs in release notes and the website.
+  with SHA256 checksums. Publishing is paused (see distribution note below):
+  no public downloads currently exist.
+- No paid Apple Developer account. Verified by release spike (2026-10-20):
+  ad-hoc-signed builds do not launch on other Macs — App Groups, shared
+  Keychain access groups and the extension sandbox are team-bound entitlements,
+  and AMFI refuses to spawn such binaries without a signing identity. The
+  File Provider architecture therefore cannot be distributed as prebuilt
+  downloads until Developer ID signing (and notarization) is added. Until
+  then the supported path is building from source; do not present prebuilt
+  DMGs as working and do not invent quarantine workarounds.
 - `AGENTS.md`, `README.md`, and `docs/` are public. Never embed secrets,
   private contact details, or content from the private `fm-landing` website
   repository in this repository.

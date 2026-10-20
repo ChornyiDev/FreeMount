@@ -52,6 +52,15 @@ swift test
 
 Details: [docs/building.md](docs/building.md).
 
+## Distribution
+
+There are no public downloads yet, and there will not be until the app can be
+signed with an Apple Developer ID and notarized. The app relies on App Groups,
+shared Keychain access groups and a sandboxed File Provider extension —
+entitlements that require a signing identity, so ad-hoc or unsigned builds do
+not launch on other Macs. Building from source with your own free Apple ID is
+the supported way to run it today.
+
 ## Documentation
 
 See [docs/](docs/README.md): [architecture](docs/architecture.md), [security](docs/security.md), [adding a provider](docs/adding-a-provider.md).
