@@ -60,9 +60,27 @@ jobs:
             exit 1
           fi
 
-      - name: Ad-hoc sign bundle (nested Mach-O first, then app)
+      - name: Stage app bundle (rename, prune foreign rclone runtime)
         run: |
           APP="ci-derived/Build/Products/Release/FM.app"
+          # Reclaim runner disk before image creation.
+          rm -rf "$HOME/Library/Developer/Xcode/DerivedData" \
+                 ci-derived/Build/Intermediates.noindex
+          STAGE="dmg-stage"
+          mkdir -p "$STAGE"
+          # Ship as FreeMount.app even though PRODUCT_NAME is FM.
+          cp -R "$APP" "$STAGE/FreeMount.app"
+          # Slim DMG: keep only the rclone helper matching this build's arch.
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            rm -f "$STAGE/FreeMount.app/Contents/Helpers/rclone-amd64"
+          else
+            rm -f "$STAGE/FreeMount.app/Contents/Helpers/rclone-arm64"
+          fi
+          ln -s /Applications "$STAGE/Applications"
+
+      - name: Ad-hoc sign staged bundle (nested Mach-O first, then app)
+        run: |
+          APP="dmg-stage/FreeMount.app"
           # TODO(Task 12 spike): verify App Group + Keychain access group +
           # File Provider registration survive ad-hoc signing on a clean Mac.
           # Xcode expands $(TeamIdentifierPrefix)/$(AppIdentifierPrefix) only in
@@ -85,26 +103,21 @@ jobs:
           PYEOF
           # CI builds with signing disabled, so bundled rclone helpers arrive
           # unsigned; every Mach-O must carry a signature to run (required on
-          # Apple silicon), hence sign helpers -> appex -> app.
-          codesign --force --sign - "$APP/Contents/Helpers/rclone-arm64"
-          codesign --force --sign - "$APP/Contents/Helpers/rclone-amd64"
+          # Apple silicon), hence sign helpers -> appex -> app. Helpers now
+          # contain exactly one entry, matching this DMG's architecture.
+          find "$APP/Contents/Helpers" -type f -exec codesign --force --sign - {} \;
           codesign --force --sign - --entitlements /tmp/ext.ent \
             "$APP/Contents/PlugIns/FreeMountFileProvider.appex"
           codesign --force --sign - --entitlements /tmp/app.ent "$APP"
           codesign --verify --deep --strict --verbose=2 "$APP"
-          codesign -d --entitlements :- "$APP" | grep -q 'TeamIdentifierPrefix' && exit 1 || true
+          ! codesign -d --entitlements - "$APP" 2>/dev/null | grep -q 'TeamIdentifierPrefix'
 
       - name: Create DMG
         run: |
-          APP="ci-derived/Build/Products/Release/FM.app"
-          STAGE="dmg-stage"
-          mkdir -p "$STAGE"
-          # Ship as FreeMount.app even though PRODUCT_NAME is FM.
-          cp -R "$APP" "$STAGE/FreeMount.app"
-          ln -s /Applications "$STAGE/Applications"
-          hdiutil create -volname FreeMount -srcfolder "$STAGE" -ov \
+          hdiutil create -volname FreeMount -srcfolder dmg-stage -ov \
             -format UDZO "FreeMount-${GITHUB_REF_NAME}-${{ matrix.arch }}.dmg"
           shasum -a 256 "FreeMount-${GITHUB_REF_NAME}-${{ matrix.arch }}.dmg" >> checksums.txt
+          rm -rf dmg-stage
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
