@@ -14,10 +14,10 @@ jobs:
     name: Build & unit tests
     runs-on: macos-26
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Cache pinned rclone runtime
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .build/rclone-artifacts
           key: rclone-v1.75.1
