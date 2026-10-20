@@ -1,0 +1,42 @@
+# CI for every push/PR to main: shared-logic tests + full app/extension build.
+# Signing is disabled here by design (no paid Apple account); CI proves the code
+# compiles and unit tests pass. Ad-hoc signing happens only in Release workflow.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    name: Build & unit tests
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache pinned rclone runtime
+        uses: actions/cache@v4
+        with:
+          path: .build/rclone-artifacts
+          key: rclone-v1.75.1
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Use example build configuration
+        run: cp Configs/Secrets.xcconfig.example Configs/Secrets.xcconfig
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Unit tests (shared Swift logic)
+        run: swift test
+
+      - name: Build app and File Provider extension
+        run: |
+          xcodebuild -project FreeMount.xcodeproj -scheme FreeMount \
+            -configuration Debug -destination 'platform=macOS' \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
+            build

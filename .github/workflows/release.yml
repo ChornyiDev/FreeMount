@@ -1,0 +1,109 @@
+# Triggered by a version tag (v1.0.0): builds one DMG per architecture with
+# ad-hoc signing and publishes a GitHub Release with checksums and first-launch
+# instructions. Download URLs match the website convention agreed in fm-landing
+# (site CTA points at /releases/latest).
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  build-dmg:
+    name: Build DMG (${{ matrix.arch }})
+    runs-on: macos-15
+    strategy:
+      matrix:
+        arch: [arm64, x86_64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache pinned rclone runtime
+        uses: actions/cache@v4
+        with:
+          path: .build/rclone-artifacts
+          key: rclone-v1.75.1
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Use example build configuration
+        run: cp Configs/Secrets.xcconfig.example Configs/Secrets.xcconfig
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build Release (${{ matrix.arch }})
+        run: |
+          xcodebuild -project FreeMount.xcodeproj -scheme FreeMount \
+            -configuration Release -destination 'platform=macOS' \
+            -derivedDataPath ci-derived \
+            ARCHS=${{ matrix.arch }} ONLY_ACTIVE_ARCH=NO \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
+            build
+
+      - name: Ad-hoc sign bundle (extension first, then app)
+        run: |
+          APP="ci-derived/Build/Products/Release/FM.app"
+          # TODO(Task 12 spike): verify App Group + Keychain access group +
+          # File Provider registration survive ad-hoc signing on a clean Mac.
+          codesign --force --sign - \
+            --entitlements App/FileProviderExtension/FreeMountFileProvider.entitlements \
+            "$APP/Contents/PlugIns/FreeMountFileProvider.appex"
+          codesign --force --sign - \
+            --entitlements App/Resources/FreeMount.entitlements \
+            "$APP"
+          codesign --verify --deep --verbose=2 "$APP"
+
+      - name: Create DMG
+        run: |
+          APP="ci-derived/Build/Products/Release/FM.app"
+          STAGE="dmg-stage"
+          mkdir -p "$STAGE"
+          # Ship as FreeMount.app even though PRODUCT_NAME is FM.
+          cp -R "$APP" "$STAGE/FreeMount.app"
+          ln -s /Applications "$STAGE/Applications"
+          hdiutil create -volname FreeMount -srcfolder "$STAGE" -ov \
+            -format UDZO "FreeMount-${GITHUB_REF_NAME}-${{ matrix.arch }}.dmg"
+          shasum -a 256 "FreeMount-${GITHUB_REF_NAME}-${{ matrix.arch }}.dmg" >> checksums.txt
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dmg-${{ matrix.arch }}
+          path: |
+            FreeMount-${{ github.ref_name }}-${{ matrix.arch }}.dmg
+            checksums.txt
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: build-dmg
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+
+      - name: Release notes
+        id: notes
+        run: |
+          {
+            echo 'body<<EOF'
+            echo 'First-run note: builds are ad-hoc signed without Apple notarization (open source, no paid developer account). If macOS blocks the app, follow the steps in the repository README or remove quarantine with `xattr -dr com.apple.quarantine /Applications/FreeMount.app`.'
+            echo
+            echo '## Checksums'
+            echo '```'
+            cat checksums.txt
+            echo '```'
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: FreeMount-*.dmg
+          body: ${{ steps.notes.outputs.body }}
+          generate_release_notes: true
