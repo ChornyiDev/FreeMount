@@ -21,11 +21,25 @@ while [[ $# -gt 0 ]]; do
 done
 
 xcode-select -p >/dev/null || { print -u2 "Xcode is required (xcode-select --install or install Xcode)."; exit 1; }
-command -v xcodegen >/dev/null || {
-    command -v brew >/dev/null || { print -u2 "XcodeGen missing and Homebrew not found. Install one: brew install xcodegen"; exit 1; }
-    print "Installing XcodeGen…"
-    brew install xcodegen
-}
+
+# FreeMount.xcodeproj is committed in the repository. We only require XcodeGen
+# if the project file is missing or if project.yml has newer local changes.
+if [[ ! -d FreeMount.xcodeproj ]]; then
+    if ! command -v xcodegen >/dev/null; then
+        command -v brew >/dev/null || {
+            print -u2 "FreeMount.xcodeproj is missing and neither XcodeGen nor Homebrew was found."
+            print -u2 "Please install XcodeGen (brew install xcodegen) or restore FreeMount.xcodeproj from git."
+            exit 1
+        }
+        print "Installing XcodeGen…"
+        brew install xcodegen
+    fi
+    print "Generating Xcode project…"
+    xcodegen generate
+elif command -v xcodegen >/dev/null && [[ -f project.yml ]] && [[ project.yml -nt FreeMount.xcodeproj/project.pbxproj ]]; then
+    print "project.yml has local changes; regenerating FreeMount.xcodeproj…"
+    xcodegen generate
+fi
 
 if [[ ! -f Configs/Secrets.xcconfig ]]; then
     cp Configs/Secrets.xcconfig.example Configs/Secrets.xcconfig
@@ -36,8 +50,19 @@ fi
 team="$team_override"
 [[ -z "$team" ]] && team="$(awk -F'=' '/^DEVELOPMENT_TEAM/ {gsub(/[ \t]/,"",$2); print $2}' Configs/Secrets.xcconfig)"
 if [[ -z "$team" ]]; then
-    teams=($(security find-identity -p codesigning -v \
-        | sed -nE 's/.*"Apple Development: .*\(([A-Z0-9]{10})\)".*/\1/p' | sort -u))
+    # Extract authentic Apple Developer Team ID (the OU field of the certificate)
+    teams=($(python3 -c '
+import subprocess, re
+res = subprocess.run(["security", "find-certificate", "-a", "-c", "Apple Development", "-p"], capture_output=True, text=True)
+certs = re.findall(r"-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", res.stdout, re.DOTALL)
+seen = []
+for c in certs:
+    p = subprocess.run(["openssl", "x509", "-noout", "-subject"], input=c, text=True, capture_output=True)
+    m = re.search(r"OU\s*=\s*([A-Z0-9]{10})", p.stdout)
+    if m and m.group(1) not in seen:
+        seen.append(m.group(1))
+print(" ".join(seen))
+' 2>/dev/null || true))
     if (( ${#teams[@]} == 0 )); then
         print -u2 "No 'Apple Development' certificate found. Open Xcode → Settings → Accounts and sign in with your Apple ID once, then re-run."
         exit 1
@@ -47,9 +72,6 @@ if [[ -z "$team" ]]; then
     sed -i '' "s/^DEVELOPMENT_TEAM = .*/DEVELOPMENT_TEAM = $team/" Configs/Secrets.xcconfig
     print "Auto-detected team $team and saved it to Configs/Secrets.xcconfig."
 fi
-
-print "Generating Xcode project…"
-xcodegen generate
 
 print "Building Release (first run may take a few minutes; Xcode provisions your personal team automatically)…"
 xcodebuild -project FreeMount.xcodeproj -scheme FreeMount \
