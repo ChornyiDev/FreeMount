@@ -41,10 +41,17 @@ The app starts an authenticated local `rclone rcd`, then registers File Provider
 
 ## Build
 
-Requires macOS 14+, Xcode and XcodeGen. A free Apple ID is enough to build and run it locally.
+Requires macOS 14+, Xcode and XcodeGen. A free Apple ID is enough to build and run it
+locally. For a hands-off install use [`scripts/install-from-source.sh`](docs/install-from-source.md):
 
 ```bash
-cp Configs/Secrets.xcconfig.example Configs/Secrets.xcconfig   # add your Team ID and OAuth client
+./scripts/install-from-source.sh
+```
+
+Manual path:
+
+```bash
+cp Configs/Secrets.xcconfig.example Configs/Secrets.xcconfig   # set your Team ID (OAuth defaults are bundled)
 xcodegen generate
 xcodebuild -project FreeMount.xcodeproj -scheme FreeMount -configuration Debug -allowProvisioningUpdates build
 swift test
@@ -59,7 +66,8 @@ signed with an Apple Developer ID and notarized. The app relies on App Groups,
 shared Keychain access groups and a sandboxed File Provider extension —
 entitlements that require a signing identity, so ad-hoc or unsigned builds do
 not launch on other Macs. Building from source with your own free Apple ID is
-the supported way to run it today.
+the supported way to run it today — see
+[docs/install-from-source.md](docs/install-from-source.md).
 
 ## Documentation
 

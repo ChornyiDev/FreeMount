@@ -116,6 +116,9 @@ root/
 ### Security & Keychain
 - Never write plaintext passwords, secret keys, or OAuth refresh tokens to plaintext config files.
 - Store sensitive values in macOS Keychain (`Security.framework`).
+- The Google OAuth desktop client committed in `Configs/Secrets.xcconfig.example`
+is a shipped project default, public by design for installed apps — not a user
+secret. User tokens and passwords remain Keychain-only.
 - Obfuscate or stream config securely to `rclone` during mount creation.
 - Check `.gitignore` to ensure credentials, `serviceAccountKey.json`, `*.pem`, `*.key`, and `rclone.conf` are strictly excluded.
 

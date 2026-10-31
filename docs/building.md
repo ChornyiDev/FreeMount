@@ -19,9 +19,12 @@ Edit `Configs/Secrets.xcconfig` (git-ignored):
 | Key | Where to get it |
 |---|---|
 | `DEVELOPMENT_TEAM` | Your Team ID: Xcode → Settings → Accounts → select your team |
-| `FREEMOUNT_GOOGLE_CLIENT_ID` / `FREEMOUNT_GOOGLE_CLIENT_SECRET` | Google Cloud Console → APIs & Services → Credentials → OAuth client of type **Desktop app** |
+| `FREEMOUNT_GOOGLE_CLIENT_ID` / `FREEMOUNT_GOOGLE_CLIENT_SECRET` | Defaults are bundled; optionally your own Google Cloud Console **Desktop app** OAuth client |
 
-Google Drive and GCS (Google Account sign-in) need your own OAuth client. SFTP,
+The repository bundles a default Google Desktop OAuth client (public by
+design for installed apps; replace it in your local copy if you want your own
+quota or a verified consent screen). Google Drive and GCS sign-in work out of
+the box with the bundled values. SFTP,
 WebDAV, SMB, FTP and GCS service-account connections do not.
 
 ## Build and test

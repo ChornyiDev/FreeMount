@@ -9,6 +9,9 @@ official v1.75.1 darwin arm64/amd64 archives and caches extracted binaries.
 `package-rclone-runtime.sh` embeds both binaries and the upstream MIT notice, then
 signs helpers with the Xcode identity. `install-rclone-runtime.sh` atomically
 installs the host architecture binary with ad-hoc development signing.
+`install-from-source.sh` builds the full app with the user's personal team and
+installs /Applications/FreeMount.app (the supported distribution path; see
+docs/install-from-source.md).
 
 ## Current State
 Version v1.75.1; no custom patches, source compilation or Go bootstrap.
