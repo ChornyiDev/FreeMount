@@ -4,11 +4,11 @@ FreeMount is an open-source macOS app that shows cloud storage in Finder. It is 
 
 ## Screenshots
 
-| Menu Bar | New Connection |
+| Menu Bar | Settings |
 | :---: | :---: |
-| ![FreeMount Menu Bar](assets/screens/menu-bar.png) | ![FreeMount New Connection](assets/screens/connection-form.png) |
-| **Connection Manager** | **Settings** |
-| ![FreeMount Connection Manager](assets/screens/connection-manager.png) | ![FreeMount Settings](assets/screens/settings.png) |
+| ![FreeMount Menu Bar](assets/screens/menu-bar.png) | ![FreeMount Settings](assets/screens/settings.png) |
+| **New Connection** | **Connection Manager** |
+| ![FreeMount New Connection](assets/screens/connection-form.png) | ![FreeMount Connection Manager](assets/screens/connection-manager.png) |
 
 ## Why FreeMount
 
