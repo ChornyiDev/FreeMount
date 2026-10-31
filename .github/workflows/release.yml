@@ -35,9 +35,12 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         run: |
-          test -n "$GOOGLE_CLIENT_ID" || { echo "Release builds require Google OAuth secrets"; exit 1; }
-          printf 'FREEMOUNT_GOOGLE_CLIENT_ID = %s\nFREEMOUNT_GOOGLE_CLIENT_SECRET = %s\nDEVELOPMENT_TEAM =\n' \
-            "$GOOGLE_CLIENT_ID" "$GOOGLE_CLIENT_SECRET" > Configs/Secrets.xcconfig
+          if [ -n "$GOOGLE_CLIENT_ID" ]; then
+            printf 'FREEMOUNT_GOOGLE_CLIENT_ID = %s\nFREEMOUNT_GOOGLE_CLIENT_SECRET = %s\nDEVELOPMENT_TEAM =\n' \
+              "$GOOGLE_CLIENT_ID" "$GOOGLE_CLIENT_SECRET" > Configs/Secrets.xcconfig
+          else
+            cp Configs/Secrets.xcconfig.example Configs/Secrets.xcconfig
+          fi
 
       - name: Generate Xcode project
         run: xcodegen generate
