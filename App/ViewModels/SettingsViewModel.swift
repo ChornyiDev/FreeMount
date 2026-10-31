@@ -13,6 +13,10 @@ final class SettingsViewModel {
     private(set) var isRestarting = false
     private(set) var errorMessage: String?
 
+    // Update checking state
+    private(set) var updateStatus: UpdateCheckStatus = .idle
+    private let updateService = UpdateService()
+
     init(supervisor: RcloneProcessSupervisor) {
         self.supervisor = supervisor
     }
@@ -63,5 +67,26 @@ final class SettingsViewModel {
         let hours = seconds / 3600
         let minutes = (seconds % 3600) / 60
         return hours > 0 ? "\(hours)h \(minutes)m" : "\(minutes)m"
+    }
+
+    func checkForUpdates(currentVersion: String) async {
+        guard updateStatus != .checking else { return }
+        updateStatus = .checking
+        do {
+            let release = try await updateService.fetchLatestRelease()
+            if UpdateService.isVersion(release.tagName, newerThan: currentVersion) {
+                updateStatus = .updateAvailable(
+                    latestVersion: release.tagName,
+                    currentVersion: currentVersion,
+                    release: release
+                )
+            } else {
+                updateStatus = .upToDate(currentVersion: currentVersion)
+            }
+        } catch UpdateError.noReleasesFound {
+            updateStatus = .upToDate(currentVersion: currentVersion)
+        } catch {
+            updateStatus = .failed(message: error.localizedDescription)
+        }
     }
 }

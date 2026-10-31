@@ -1,7 +1,6 @@
-# Triggered by a version tag (v1.0.0): builds one DMG per architecture with
-# ad-hoc signing and publishes a GitHub Release with checksums and first-launch
-# instructions. Download URLs match the website convention agreed in fm-landing
-# (site CTA points at /releases/latest).
+# Triggered by a version tag (v1.0.0): publishes release notes and update instructions
+# on GitHub Releases without producing ad-hoc prebuilt binaries (since File Provider
+# extensions require local code signing with personal Apple ID for AMFI / App Groups).
 name: Release
 
 on:
@@ -12,150 +11,26 @@ permissions:
   contents: write
 
 jobs:
-  build-dmg:
-    name: Build DMG (${{ matrix.arch }})
-    runs-on: macos-26
-    strategy:
-      matrix:
-        arch: [arm64, x86_64]
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Cache pinned rclone runtime
-        uses: actions/cache@v6
-        with:
-          path: .build/rclone-artifacts
-          key: rclone-v1.75.1
-
-      - name: Install XcodeGen
-        run: brew install xcodegen
-
-      - name: Materialize build configuration
-        env:
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-        run: |
-          if [ -n "$GOOGLE_CLIENT_ID" ]; then
-            printf 'FREEMOUNT_GOOGLE_CLIENT_ID = %s\nFREEMOUNT_GOOGLE_CLIENT_SECRET = %s\nDEVELOPMENT_TEAM =\n' \
-              "$GOOGLE_CLIENT_ID" "$GOOGLE_CLIENT_SECRET" > Configs/Secrets.xcconfig
-          else
-            cp Configs/Secrets.xcconfig.example Configs/Secrets.xcconfig
-          fi
-
-      - name: Generate Xcode project
-        run: xcodegen generate
-
-      - name: Build Release (${{ matrix.arch }})
-        run: |
-          xcodebuild -project FreeMount.xcodeproj -scheme FreeMount \
-            -configuration Release -destination 'platform=macOS' \
-            -derivedDataPath ci-derived \
-            ARCHS=${{ matrix.arch }} ONLY_ACTIVE_ARCH=NO \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO \
-            build
-
-      - name: Verify OAuth config embedded in built app
-        run: |
-          APP="ci-derived/Build/Products/Release/FM.app"
-          ID="$(plutil -extract FreeMountGoogleOAuthClientID raw "$APP/Contents/Info.plist" 2>/dev/null || true)"
-          if [ -z "$ID" ]; then
-            echo "::error=Built app has empty FREEMOUNT_GOOGLE_CLIENT_ID — xcconfig wiring or secrets broken"
-            exit 1
-          fi
-
-      - name: Stage app bundle (rename, prune foreign rclone runtime)
-        run: |
-          APP="ci-derived/Build/Products/Release/FM.app"
-          # Reclaim runner disk before image creation.
-          rm -rf "$HOME/Library/Developer/Xcode/DerivedData" \
-                 ci-derived/Build/Intermediates.noindex
-          STAGE="dmg-stage"
-          mkdir -p "$STAGE"
-          # Ship as FreeMount.app even though PRODUCT_NAME is FM.
-          cp -R "$APP" "$STAGE/FreeMount.app"
-          # Slim DMG: keep only the rclone helper matching this build's arch.
-          if [ "${{ matrix.arch }}" = "arm64" ]; then
-            rm -f "$STAGE/FreeMount.app/Contents/Helpers/rclone-amd64"
-          else
-            rm -f "$STAGE/FreeMount.app/Contents/Helpers/rclone-arm64"
-          fi
-          ln -s /Applications "$STAGE/Applications"
-
-      - name: Ad-hoc sign staged bundle (nested Mach-O first, then app)
-        run: |
-          APP="dmg-stage/FreeMount.app"
-          # TODO(Task 12 spike): verify App Group + Keychain access group +
-          # File Provider registration survive ad-hoc signing on a clean Mac.
-          # Xcode expands $(TeamIdentifierPrefix)/$(AppIdentifierPrefix) only in
-          # its own signing step; manual codesign embeds them literally, so for
-          # ad-hoc (no team) builds we strip the empty prefixes ourselves.
-          python3 - <<'PYEOF'
-          import plistlib
-          def clean(src, dst):
-              d = plistlib.load(open(src, "rb"))
-              for k, v in list(d.items()):
-                  if isinstance(v, list):
-                      v = [s.replace("$(TeamIdentifierPrefix)", "").replace("$(AppIdentifierPrefix)", "")
-                           if isinstance(s, str) else s for s in v]
-                      d[k] = [s for s in v if s != ""]
-                  elif isinstance(v, str):
-                      d[k] = v.replace("$(TeamIdentifierPrefix)", "").replace("$(AppIdentifierPrefix)", "")
-              plistlib.dump(d, open(dst, "wb"))
-          clean("App/Resources/FreeMount.entitlements", "/tmp/app.ent")
-          clean("App/FileProviderExtension/FreeMountFileProvider.entitlements", "/tmp/ext.ent")
-          PYEOF
-          # CI builds with signing disabled, so bundled rclone helpers arrive
-          # unsigned; every Mach-O must carry a signature to run (required on
-          # Apple silicon), hence sign helpers -> appex -> app. Helpers now
-          # contain exactly one entry, matching this DMG's architecture.
-          find "$APP/Contents/Helpers" -type f -exec codesign --force --sign - {} \;
-          codesign --force --sign - --entitlements /tmp/ext.ent \
-            "$APP/Contents/PlugIns/FreeMountFileProvider.appex"
-          codesign --force --sign - --entitlements /tmp/app.ent "$APP"
-          codesign --verify --deep --strict --verbose=2 "$APP"
-          ! codesign -d --entitlements - "$APP" 2>/dev/null | grep -q 'TeamIdentifierPrefix'
-
-      - name: Create DMG
-        run: |
-          hdiutil create -volname FreeMount -srcfolder dmg-stage -ov \
-            -format UDZO "FreeMount-${GITHUB_REF_NAME}-${{ matrix.arch }}.dmg"
-          shasum -a 256 "FreeMount-${GITHUB_REF_NAME}-${{ matrix.arch }}.dmg" >> checksums.txt
-          rm -rf dmg-stage
-
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: dmg-${{ matrix.arch }}
-          path: |
-            FreeMount-${{ github.ref_name }}-${{ matrix.arch }}.dmg
-            checksums.txt
-
   publish-release:
-    name: Publish GitHub Release
-    needs: build-dmg
+    name: Publish Release Notes
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v8
-        with:
-          merge-multiple: true
-
-      - name: Release notes
-        id: notes
-        run: |
-          {
-            echo 'body<<EOF'
-            echo 'First-run note: builds are ad-hoc signed without Apple notarization (open source, no paid developer account). If macOS blocks the app, follow the steps in the repository README or remove quarantine with `xattr -dr com.apple.quarantine /Applications/FreeMount.app`.'
-            echo
-            echo '## Checksums'
-            echo '```'
-            cat checksums.txt
-            echo '```'
-            echo EOF
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Create release
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
-          files: FreeMount-*.dmg
-          body: ${{ steps.notes.outputs.body }}
           generate_release_notes: true
+          body: |
+            ### Installing or Updating FreeMount
+
+            Because FreeMount uses Apple File Provider extensions, App Groups, and Keychain sharing, macOS requires it to be signed by your personal Apple ID team. Prebuilt unsigned or ad-hoc binaries cannot launch the extension on other Macs.
+
+            #### One-line Install / Update
+            Run the install script in Terminal:
+            ```bash
+            git clone https://github.com/ChornyiDev/FreeMount.git && cd FreeMount && ./scripts/install-from-source.sh
+            ```
+
+            If you already have FreeMount installed, click **"Update Now"** in FreeMount Settings → About, or run:
+            ```bash
+            cd ~/FreeMount && git pull && ./scripts/install-from-source.sh
+            ```

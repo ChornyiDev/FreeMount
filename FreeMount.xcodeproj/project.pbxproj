@@ -60,6 +60,7 @@
 		575573215F4F54CCF9809A22 /* RcloneRemoteCredential.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1A681282640DF383476AFC /* RcloneRemoteCredential.swift */; };
 		5B8F6C73A59B634795A975B2 /* ConnectionManagerWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE4C58E48E6C0B914B65F77D /* ConnectionManagerWindow.swift */; };
 		5E6BF40871AD052BC6026A87 /* ConnectionDiagnostic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F86CF1B1FA8183BDE7AC27 /* ConnectionDiagnostic.swift */; };
+		5F772BF7C21C7B53E4360FEA /* UpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B77D562FE95A45B3698C508E /* UpdateService.swift */; };
 		60F5E2AC01C3F94274EDB207 /* RcloneJobModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D799AD75BD423C55CB4EE95 /* RcloneJobModels.swift */; };
 		612F16F805316A1239189FD2 /* SSHTunnelConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C2726BB361981A5C767923 /* SSHTunnelConfiguration.swift */; };
 		61BA0F4EC7648FEC62177215 /* TransferStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FC3BA3EC71AFCD7A4CE8ED3 /* TransferStats.swift */; };
@@ -80,6 +81,7 @@
 		7538D8CE7351DDBCAEA946E2 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B155EDD0651910A0FB34365A /* MenuBarView.swift */; };
 		767100BFD2A5DB4D690BA831 /* ConnectionFormSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30E15859287E06296D129C4D /* ConnectionFormSection.swift */; };
 		775FC3CBF6B861BC047AF268 /* ConnectionSidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 584E765A87A42CB7CC534285 /* ConnectionSidebarView.swift */; };
+		77671E8C5C13E0CFCDD54D50 /* UpdateWorkflowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F87CE2CAD7AA678E56D78CA8 /* UpdateWorkflowManager.swift */; };
 		776D87FFED621BC035ACFACD /* GoogleCloudStorageModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E855D8007C2398697972AF /* GoogleCloudStorageModels.swift */; };
 		7886A198AD8CECC2652D2EC7 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC5438FBC1F5C96C964DCC9D /* Errors.swift */; };
 		78FEE414E8C5BDAB4F5B8BF7 /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5795B9DA47C6CD208908508 /* AppPreferences.swift */; };
@@ -91,6 +93,7 @@
 		8F27B02FBE887E07FB8A87FD /* CredentialRedactor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A68BE09BABFD9847AF7BD487 /* CredentialRedactor.swift */; };
 		951E5D6A90928E8E84F6C6C3 /* MountStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9FF66AA2849C2E0230AACA3 /* MountStatus.swift */; };
 		954D94C53F19EF8082A293A4 /* SSHTunnelConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C2726BB361981A5C767923 /* SSHTunnelConfiguration.swift */; };
+		95E08BD3518A780A3CD4B418 /* UpdateWorkflowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F87CE2CAD7AA678E56D78CA8 /* UpdateWorkflowManager.swift */; };
 		9851C1B36C93FD9CA88C8001 /* FTPFileProviderBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA61544B3A67E742E2FAEC8F /* FTPFileProviderBackend.swift */; };
 		99037D0875A2F9BEED630133 /* ProviderID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42E2BCD8B94D811E984DB95 /* ProviderID.swift */; };
 		9A32EDB4BA9B8B3BD698DEAE /* FileProviderWorkingSetCollector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3441C93E33048C0C4C9E7828 /* FileProviderWorkingSetCollector.swift */; };
@@ -102,6 +105,7 @@
 		ADDC8A3AC62EEE9F1897AF10 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F147F1D26C596753CE1D9F /* SettingsViewModel.swift */; };
 		AEAA8C30AB2BC875A3DE3FC0 /* SSHKeyDiscoveryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9EE964AA60F26C21316EE56 /* SSHKeyDiscoveryService.swift */; };
 		B2D0D02B24E146DBCC4F19EF /* GoogleDriveFileProviderBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = E422A903F5E57FD69DC5E3C8 /* GoogleDriveFileProviderBackend.swift */; };
+		B2ED010E0FF4AB7E2027A193 /* UpdateService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B77D562FE95A45B3698C508E /* UpdateService.swift */; };
 		B4760D12F58B6D1587D76307 /* SMBConnectionForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 541AD4606527357A4D40B06D /* SMBConnectionForm.swift */; };
 		B68BC3AB2284F688126246E4 /* ProviderID.swift in Sources */ = {isa = PBXBuildFile; fileRef = F42E2BCD8B94D811E984DB95 /* ProviderID.swift */; };
 		B8F4B124D540A3A3D8E6DFF9 /* ConnectionVerificationState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0844F4C1A173CF08A59CDF1C /* ConnectionVerificationState.swift */; };
@@ -137,6 +141,7 @@
 		DFA9E49355EFF4AD39AC7154 /* SMBConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352FB7DF306047439F9945A6 /* SMBConfiguration.swift */; };
 		DFE9AEFF0FC1B128159AAE28 /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94F147F1D26C596753CE1D9F /* SettingsViewModel.swift */; };
 		E043E7CFB41797032230209E /* SFTPFileProviderBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C88B0957DED4BEAFF5C645C /* SFTPFileProviderBackend.swift */; };
+		E086453CE0F6AD0040C54450 /* UpdateSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8379200509ED114FC607FC2 /* UpdateSectionView.swift */; };
 		E1039C9945FAB5E4C434E928 /* ConnectionPreflightService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE4781D4AD279629A81328E /* ConnectionPreflightService.swift */; };
 		E206F09ED8F87B274BA7D463 /* RcloneBinaryLocator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DC0CF94DA57D4CE411AA764 /* RcloneBinaryLocator.swift */; };
 		E3C1C6F120E443C4DF0288F4 /* ConnectionTestSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF1B1FDACE50287887666C43 /* ConnectionTestSection.swift */; };
@@ -249,6 +254,8 @@
 		B155EDD0651910A0FB34365A /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
 		B16E4C199191E32BDAC02A03 /* AppLifecycleDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLifecycleDelegate.swift; sourceTree = "<group>"; };
 		B170FCC8467337B42EB06234 /* CloudProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudProvider.swift; sourceTree = "<group>"; };
+		B77D562FE95A45B3698C508E /* UpdateService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateService.swift; sourceTree = "<group>"; };
+		B8379200509ED114FC607FC2 /* UpdateSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateSectionView.swift; sourceTree = "<group>"; };
 		BD287CCB1D246EDF08BA679B /* GoogleDriveOAuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleDriveOAuthService.swift; sourceTree = "<group>"; };
 		BE69F5E28BFE906B8D923AEA /* WebDAVConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebDAVConfiguration.swift; sourceTree = "<group>"; };
 		C41930E6164FF50FC269922C /* GoogleCloudHealthDiagnostic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleCloudHealthDiagnostic.swift; sourceTree = "<group>"; };
@@ -276,6 +283,7 @@
 		EF1B1FDACE50287887666C43 /* ConnectionTestSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionTestSection.swift; sourceTree = "<group>"; };
 		F0E4F7A2121757919668EF2A /* FileProviderDomainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileProviderDomainStore.swift; sourceTree = "<group>"; };
 		F42E2BCD8B94D811E984DB95 /* ProviderID.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderID.swift; sourceTree = "<group>"; };
+		F87CE2CAD7AA678E56D78CA8 /* UpdateWorkflowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateWorkflowManager.swift; sourceTree = "<group>"; };
 		FA26B8E29653BA18752651DA /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -328,6 +336,8 @@
 				26BAE57AFC786C4702B31C50 /* SSHConfigParser.swift */,
 				E9EE964AA60F26C21316EE56 /* SSHKeyDiscoveryService.swift */,
 				E2C2726BB361981A5C767923 /* SSHTunnelConfiguration.swift */,
+				B77D562FE95A45B3698C508E /* UpdateService.swift */,
+				F87CE2CAD7AA678E56D78CA8 /* UpdateWorkflowManager.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -361,6 +371,7 @@
 			isa = PBXGroup;
 			children = (
 				2BF0E329C2FC0395C80D619C /* SettingsView.swift */,
+				B8379200509ED114FC607FC2 /* UpdateSectionView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -824,6 +835,9 @@
 				DFE9AEFF0FC1B128159AAE28 /* SettingsViewModel.swift in Sources */,
 				2D5D86EAEB2B2E0B4F559347 /* ThroughputWidget.swift in Sources */,
 				61BA0F4EC7648FEC62177215 /* TransferStats.swift in Sources */,
+				E086453CE0F6AD0040C54450 /* UpdateSectionView.swift in Sources */,
+				5F772BF7C21C7B53E4360FEA /* UpdateService.swift in Sources */,
+				95E08BD3518A780A3CD4B418 /* UpdateWorkflowManager.swift in Sources */,
 				DB99A6A06F89E1394AD73F52 /* WebDAVConfiguration.swift in Sources */,
 				EE344D71C195BB644500204B /* WebDAVConnectionForm.swift in Sources */,
 				CE8AF3A208E7280975727D26 /* WebDAVFileProviderBackend.swift in Sources */,
@@ -893,6 +907,8 @@
 				954D94C53F19EF8082A293A4 /* SSHTunnelConfiguration.swift in Sources */,
 				ADDC8A3AC62EEE9F1897AF10 /* SettingsViewModel.swift in Sources */,
 				FDCCA1AEF0E48710B8245B76 /* TransferStats.swift in Sources */,
+				B2ED010E0FF4AB7E2027A193 /* UpdateService.swift in Sources */,
+				77671E8C5C13E0CFCDD54D50 /* UpdateWorkflowManager.swift in Sources */,
 				56735BAC481CA1DF103F39A8 /* WebDAVConfiguration.swift in Sources */,
 				2FD1CFDA25C1A19D32385184 /* WebDAVFileProviderBackend.swift in Sources */,
 			);

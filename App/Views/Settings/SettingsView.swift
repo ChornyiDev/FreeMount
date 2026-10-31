@@ -131,6 +131,15 @@ struct SettingsView: View {
             Text("Native macOS cloud storage powered by Apple File Provider and rclone.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(Color.dsTextSecondary)
+
+            UpdateSectionView(
+                status: viewModel.updateStatus,
+                currentVersion: appVersion,
+                onCheck: {
+                    Task { await viewModel.checkForUpdates(currentVersion: appVersion) }
+                }
+            )
+
             Text("rclone is distributed under the MIT License. Notices are included with the application.")
                 .font(.caption)
                 .foregroundStyle(Color.dsTextMuted)

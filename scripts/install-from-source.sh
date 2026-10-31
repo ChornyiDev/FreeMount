@@ -88,6 +88,9 @@ xcodebuild -project FreeMount.xcodeproj -scheme FreeMount \
 APP="build/install-dd/Build/Products/Release/FM.app"
 codesign --verify --deep --strict "$APP" || { print -u2 "Built bundle failed signature verification."; exit 1; }
 
+# Record repository directory in user defaults so the app knows where to pull updates from
+defaults write com.freemount.app FreeMountSourceRepositoryPath "$PWD"
+
 pkill -x FM 2>/dev/null || true
 if [[ -d /Applications/FreeMount.app ]]; then rm -rf /Applications/FreeMount.app; fi
 cp -R "$APP" /Applications/FreeMount.app
