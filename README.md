@@ -2,6 +2,14 @@
 
 FreeMount is an open-source macOS app that shows cloud storage in Finder. It is built with SwiftUI, Apple's File Provider framework and [`rclone`](https://rclone.org). It needs no FUSE-T, macFUSE or NFS mounts.
 
+## Screenshots
+
+| Menu Bar | New Connection |
+| :---: | :---: |
+| ![FreeMount Menu Bar](assets/screens/menu-bar.png) | ![FreeMount New Connection](assets/screens/connection-form.png) |
+| **Connection Manager** | **Settings** |
+| ![FreeMount Connection Manager](assets/screens/connection-manager.png) | ![FreeMount Settings](assets/screens/settings.png) |
+
 ## Why FreeMount
 
 I wanted my servers and buckets in Finder like normal disks. Many of my servers have no open ports, so I need to reach them through tunnels. I built FreeMount so SFTP works that way. CloudMounter inspired the idea.
