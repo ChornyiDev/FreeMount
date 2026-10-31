@@ -14,7 +14,11 @@ Live Finder validation on real servers is pending for SMB and FTP/FTPS.
 - Supports Basic password authentication and bearer tokens. Passwords are
   obscured for rclone before storage.
 - **Digest-only servers are not supported** by the pinned runtime. A credential-free
-  HEAD probe rejects a confirmed Digest-only endpoint before listing.
+  HEAD probe rejects a confirmed Digest-only endpoint before listing. Digest
+  authentication is handled entirely inside rclone (FreeMount passes credentials
+  through); support is pending the upstream rclone fix and will work with the
+  next runtime bump once released. Bearer/Basic WebDAV servers are validated and
+  unaffected.
 - Bearer mode omits username and password: rclone prefers Basic whenever `user`
   or `pass` is present.
 - A successful listing does not prove read/write access to individual files.
