@@ -25,6 +25,9 @@ Asset collections may be separated into directories such as `images/`, `logos/`,
 - `provider-logos/` stores original provider artwork SVG files directly.
   Runtime copies exist under `Assets.xcassets/ProviderIcons/` only for
   implemented providers.
+- `screens/` contains application UI screenshots (PNG and AVIF) used for
+  documentation and README showcases (`menu-bar`, `connection-form`,
+  `connection-manager`, `settings`).
 
 ## Dependencies
 
