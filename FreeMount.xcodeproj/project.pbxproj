@@ -942,7 +942,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.freemount.app.fileprovider;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(FREEMOUNT_BUNDLE_IDENTIFIER).fileprovider";
 				PRODUCT_NAME = FreeMountFileProvider;
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
@@ -1026,7 +1026,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.freemount.app;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(FREEMOUNT_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = FM;
 				SDKROOT = macosx;
 			};
@@ -1102,7 +1102,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.freemount.app;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(FREEMOUNT_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = FM;
 				SDKROOT = macosx;
 			};
@@ -1125,7 +1125,7 @@
 					"@executable_path/../Frameworks",
 					"@executable_path/../../../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.freemount.app.fileprovider;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(FREEMOUNT_BUNDLE_IDENTIFIER).fileprovider";
 				PRODUCT_NAME = FreeMountFileProvider;
 				SDKROOT = macosx;
 				SKIP_INSTALL = NO;
