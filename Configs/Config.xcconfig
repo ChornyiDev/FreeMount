@@ -1,4 +1,6 @@
 // FreeMount Base Configuration
-// Conditionally includes local secrets if present.
+// Default bundle identifier prefix (overridden per-team in Secrets.xcconfig for source builds).
+FREEMOUNT_BUNDLE_IDENTIFIER = com.freemount.app
 
+// Conditionally includes local secrets if present.
 #include? "Secrets.xcconfig"
