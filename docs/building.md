@@ -19,6 +19,7 @@ Edit `Configs/Secrets.xcconfig` (git-ignored):
 | Key | Where to get it |
 |---|---|
 | `DEVELOPMENT_TEAM` | Your Team ID: Xcode → Settings → Accounts → select your team |
+| `FREEMOUNT_BUNDLE_IDENTIFIER` | Optional (defaults to `com.freemount.app`); set to `com.freemount.app.<DEVELOPMENT_TEAM>` for Personal Team builds (`scripts/install-from-source.sh` configures this automatically) |
 | `FREEMOUNT_GOOGLE_CLIENT_ID` / `FREEMOUNT_GOOGLE_CLIENT_SECRET` | Defaults are bundled; optionally your own Google Cloud Console **Desktop app** OAuth client |
 
 The repository bundles a default Google Desktop OAuth client (public by

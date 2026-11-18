@@ -6,8 +6,9 @@
 #
 # What it does: checks prerequisites, prepares Configs/Secrets.xcconfig
 # (Google OAuth client defaults ship in the repo), detects or takes your
-# personal team ID, builds Release, signs with your Apple Development
-# identity and installs. Re-run the same command to update after `git pull`.
+# personal team ID, sets a team-scoped bundle identifier, builds Release,
+# signs with your Apple Development identity and installs. Re-run the same
+# command to update after `git pull`.
 
 set -euo pipefail
 cd "${0:A:h:h}"
@@ -73,11 +74,27 @@ print(" ".join(seen))
     print "Auto-detected team $team and saved it to Configs/Secrets.xcconfig."
 fi
 
+# Resolve team-scoped bundle identifier so personal-team builds do not collide
+# with globally registered App IDs in Apple's Developer Portal.
+bundle_id="$(awk -F'=' '/^FREEMOUNT_BUNDLE_IDENTIFIER[ \t]*=/ {gsub(/[ \t]/,"",$2); print $2}' Configs/Secrets.xcconfig)"
+if [[ -z "$bundle_id" ]]; then
+    bundle_id="com.freemount.app.$team"
+    if grep -q '^FREEMOUNT_BUNDLE_IDENTIFIER[ \t]*=' Configs/Secrets.xcconfig; then
+        sed -i '' "s/^FREEMOUNT_BUNDLE_IDENTIFIER[ \t]*=.*/FREEMOUNT_BUNDLE_IDENTIFIER = $bundle_id/" Configs/Secrets.xcconfig
+    else
+        printf '\nFREEMOUNT_BUNDLE_IDENTIFIER = %s\n' "$bundle_id" >> Configs/Secrets.xcconfig
+    fi
+    print "Configured team-scoped bundle ID $bundle_id in Configs/Secrets.xcconfig."
+elif [[ -n "$team_override" && "$bundle_id" == com.freemount.app.* ]]; then
+    bundle_id="com.freemount.app.$team"
+fi
+
 print "Building Release (first run may take a few minutes; Xcode provisions your personal team automatically)…"
 xcodebuild -project FreeMount.xcodeproj -scheme FreeMount \
     -configuration Release -destination 'platform=macOS' \
     -derivedDataPath build/install-dd \
     DEVELOPMENT_TEAM="$team" \
+    FREEMOUNT_BUNDLE_IDENTIFIER="$bundle_id" \
     -allowProvisioningUpdates \
     build >/tmp/freemount-install-build.log 2>&1 || {
         tail -20 /tmp/freemount-install-build.log
@@ -90,6 +107,9 @@ codesign --verify --deep --strict "$APP" || { print -u2 "Built bundle failed sig
 
 # Record repository directory in user defaults so the app knows where to pull updates from
 defaults write com.freemount.app FreeMountSourceRepositoryPath "$PWD"
+if [[ "$bundle_id" != "com.freemount.app" ]]; then
+    defaults write "$bundle_id" FreeMountSourceRepositoryPath "$PWD"
+fi
 
 pkill -x FM 2>/dev/null || true
 if [[ -d /Applications/FreeMount.app ]]; then rm -rf /Applications/FreeMount.app; fi
