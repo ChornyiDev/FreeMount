@@ -4,12 +4,21 @@ Thanks for helping. FreeMount is intentionally small, so please read this first.
 
 ## Before you start
 
-For anything beyond a small fix, open an issue and discuss it first. Be ready to
-answer, as in [AGENTS.md](AGENTS.md):
+For anything beyond a small fix, please open an issue to discuss it first. Note that this repository includes [AGENTS.md](AGENTS.md) for AI coding agent instructions.
 
-1. **Need:** which real scenario or bug does this solve?
-2. **Existing path:** can the current code be fixed instead of adding a new path?
-3. **Smallest solution:** why is new code necessary?
+### Branch & PR naming
+
+Follow Conventional Commits conventions for branch names and pull request titles:
+
+- **Bug fixes:**
+  - Branch: `fix/<short-description>`
+  - PR title: `fix: <summary>` (e.g. `fix: prevent timeout on large uploads`)
+- **Features & enhancements:**
+  - Branch: `feat/<short-description>`
+  - PR title: `feat: <summary>` (e.g. `feat: support WebDAV digest auth`)
+- **Documentation & maintenance:**
+  - Branch: `docs/<short-description>` or `chore/<short-description>`
+  - PR title: `docs: <summary>` or `chore: <summary>`
 
 ## Setup
 

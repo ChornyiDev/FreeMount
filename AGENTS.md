@@ -23,8 +23,10 @@ engineering rules, safety constraints, and the active technology profile.
 - Write all technical documentation, architecture plans, roadmap files, milestones, code comments, and workspace instructions in **English**.
 - The User may communicate in Ukrainian or English; reply in the user's preferred language, but maintain technical files exclusively in English.
 - Use concise, explicit technical language and reference concrete files and paths.
+- **Strict Relative Paths:** All file, directory, and workspace references in conversation, plans, roadmaps, autopsies, specifications, and documentation MUST strictly use relative links and paths (e.g., `[filename.ext](./path/to/filename.ext)` or `path/to/file.ext`). Never use absolute filesystem paths or `file:///...` links under any circumstances.
 - Propose architecture before executing large or high-risk changes.
 - Surface assumptions, risks, edge cases, security concerns, and performance implications.
+- **Human-Facing Text:** Prepare documentation, presentations, letters, specifications, and other materials intended for human readers using the humanizer skill. Load it before writing or editing such texts and follow its recommendations while preserving accuracy and substance.
 
 ## 3. Agent Role and Authority
 

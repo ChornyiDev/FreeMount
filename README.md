@@ -1,6 +1,6 @@
 # FreeMount
 
-FreeMount is an open-source macOS app that shows cloud storage in Finder. It is built with SwiftUI, Apple's File Provider framework and [`rclone`](https://rclone.org). It needs no FUSE-T, macFUSE or NFS mounts.
+FreeMount is an open-source macOS app that shows cloud storage in Finder. It is built with SwiftUI, Apple's File Provider framework and [`rclone`](https://rclone.org).
 
 ## Screenshots
 
